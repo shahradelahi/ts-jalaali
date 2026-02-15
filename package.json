@@ -1,6 +1,6 @@
 {
   "name": "@se-oss/jalaali",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Modern, lightweight, and tree-shakable Jalaali (Persian) calendar library with chainable API and native Intl support",
   "keywords": [
     "jalaali",
