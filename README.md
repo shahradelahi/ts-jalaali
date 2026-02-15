@@ -68,13 +68,11 @@ console.log(date.format('D MMMM dddd')); // ۱ فروردین Tuesday
 Detect Iran's official holidays and events (including dynamic religious holidays for the current year).
 
 ```ts
-// true (Nowruz)
-
 // Access the full list of events
 import { CALENDAR_EVENTS } from '@se-oss/jalaali';
 
 const date = jalaali({ jy: 1404, jm: 1, jd: 1 });
-console.log(date.isHoliday());
+console.log(date.isHoliday()); // true (Nowruz)
 
 console.log(CALENDAR_EVENTS[0]); // { month: 1, day: 1, title: '...', is_holiday: true }
 ```

@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      openai:
-        specifier: ^6.22.0
-        version: 6.22.0
     devDependencies:
       '@shahrad/eslint-config':
         specifier: ^1.0.1
@@ -30,6 +26,9 @@ importers:
       globals:
         specifier: ^17.3.0
         version: 17.3.0
+      openai:
+        specifier: ^6.22.0
+        version: 6.22.0
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
