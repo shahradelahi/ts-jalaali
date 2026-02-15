@@ -1,0 +1,60 @@
+{
+  "name": "@se-oss/jalaali",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "homepage": "https://github.com/shahradelahi/ts-jalaali",
+  "repository": "github:shahradelahi/ts-jalaali",
+  "license": "MIT",
+  "author": "Shahrad Elahi <shahrad@litehex.com> (https://github.com/shahradelahi)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "browser": "dist/index.cjs",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "jalaali": "./dist/cli.js"
+  },
+  "files": [
+    "dist/**",
+    "!**/*.d.cts"
+  ],
+  "scripts": {
+    "bench": "vitest bench --run",
+    "build": "pnpm typecheck && tsup",
+    "clean": "git clean -dfx \"**/node_modules/**\" dist .tsbuildinfo",
+    "dev": "tsup --watch",
+    "fetch-events": "node scripts/fetch-events.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "pnpm typecheck && eslint .",
+    "lint:fix": "eslint --fix .",
+    "prepublishOnly": "pnpm build && pnpm lint && pnpm format:check && pnpm test",
+    "test": "vitest --run",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@shahrad/prettier-config",
+  "dependencies": {
+    "openai": "^6.17.0"
+  },
+  "devDependencies": {
+    "@shahrad/eslint-config": "^1.0.1",
+    "@shahrad/prettier-config": "^1.2.2",
+    "@shahrad/tsconfig": "^1.2.0",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
+  },
+  "packageManager": "pnpm@10.23.0+sha512.21c4e5698002ade97e4efe8b8b4a89a8de3c85a37919f957e7a0f30f38fbc5bbdd05980ffe29179b2fb6e6e691242e098d945d1601772cad0fef5fb6411e2a4b"
+}
