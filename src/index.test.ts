@@ -1,6 +1,91 @@
 import { describe, expect, it } from 'vitest';
 
-import { isHoliday, jalaali, toGregorian, toJalaali } from './index';
+import {
+  isHoliday,
+  jalaali,
+  JalaaliDate,
+  jalaaliMonthLength,
+  toGregorian,
+  toJalaali,
+} from './index';
+
+describe('Jalaali Class', () => {
+  it('should be an instance of Date', () => {
+    const d = jalaali();
+    expect(d).toBeInstanceOf(Date);
+    expect(d).toBeInstanceOf(JalaaliDate);
+  });
+
+  it('should support Jalaali constructor', () => {
+    const d = new JalaaliDate(1402, 8, 5);
+    expect(d.jy).toBe(1402);
+    expect(d.jm).toBe(8);
+    expect(d.jd).toBe(5);
+    expect(d.getFullYear()).toBe(2023);
+    expect(d.getMonth()).toBe(9); // Oct (0-indexed)
+    expect(d.getDate()).toBe(27);
+  });
+
+  it('should support lazy caching', () => {
+    const d = new JalaaliDate(1402, 8, 5);
+    // Accessing jy should hydrate cache
+    expect(d.jy).toBe(1402);
+
+    // Modifying native date should invalidate cache
+    d.setFullYear(2024);
+    expect(d.getFullYear()).toBe(2024);
+    // 2024-10-27 is 1403-08-06
+    expect(d.jy).toBe(1403);
+    expect(d.jm).toBe(8);
+    expect(d.jd).toBe(6);
+  });
+
+  it('should be mutable', () => {
+    const d = jalaali({ jy: 1402, jm: 1, jd: 1 });
+    const same = d.add(1, 'day');
+    expect(same).toBe(d);
+    expect(d.jd).toBe(2);
+  });
+
+  it('should support clone for immutability', () => {
+    const d = jalaali({ jy: 1402, jm: 1, jd: 1 });
+    const cloned = d.clone().add(1, 'day');
+    expect(cloned).not.toBe(d);
+    expect(d.jd).toBe(1);
+    expect(cloned.jd).toBe(2);
+  });
+
+  it('should support Jalaali setters', () => {
+    const d = new JalaaliDate(1402, 1, 1);
+    d.setJalaaliYear(1403);
+    expect(d.jy).toBe(1403);
+    expect(d.getFullYear()).toBe(2024);
+
+    d.setJalaaliMonth(12);
+    expect(d.jm).toBe(12);
+    // 1403 is leap, so it should have 30 days
+    expect(jalaaliMonthLength(1403, 12)).toBe(30);
+
+    d.setJalaaliDate(30);
+    expect(d.jd).toBe(30);
+  });
+
+  it('should parse Jalaali strings correctly using fromFormat', () => {
+    const d = JalaaliDate.fromFormat('1404/12/02', 'YYYY/MM/DD');
+    // Jalaali 1404-12-02 is Gregorian 2026-02-21
+    expect(d.getFullYear()).toBe(2026);
+    expect(d.getMonth()).toBe(1); // Feb
+    expect(d.getDate()).toBe(21);
+    expect(d.toISOString()).toContain('2026-02-21');
+  });
+
+  it('should parse Jalaali strings with time correctly', () => {
+    const d = JalaaliDate.fromFormat('1404-12-02 14:30:45', 'YYYY-MM-DD HH:mm:ss');
+    expect(d.getHours()).toBe(14);
+    expect(d.getMinutes()).toBe(30);
+    expect(d.getSeconds()).toBe(45);
+  });
+});
 
 describe('Jalaali Core', () => {
   it('should convert Gregorian to Jalaali correctly', () => {

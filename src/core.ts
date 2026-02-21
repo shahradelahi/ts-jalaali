@@ -1,4 +1,4 @@
-import type { GregorianDate, JalaaliDate } from './typings';
+import type { GregorianObject, JalaaliObject } from './typings';
 
 const breaks = [
   -61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394,
@@ -35,7 +35,7 @@ function mod(a: number, b: number): number {
  * @param gd - Gregorian day (1-31)
  * @returns Jalaali date object
  */
-export function toJalaali(gy: number, gm: number, gd: number): JalaaliDate {
+export function toJalaali(gy: number, gm: number, gd: number): JalaaliObject {
   return d2j(g2d(gy, gm, gd));
 }
 
@@ -47,7 +47,7 @@ export function toJalaali(gy: number, gm: number, gd: number): JalaaliDate {
  * @param jd - Jalaali day (1-31)
  * @returns Gregorian date object
  */
-export function toGregorian(jy: number, jm: number, jd: number): GregorianDate {
+export function toGregorian(jy: number, jm: number, jd: number): GregorianObject {
   return d2g(j2d(jy, jm, jd));
 }
 
@@ -136,7 +136,7 @@ export function j2d(jy: number, jm: number, jd: number): number {
  * @param jdn - Julian Day number
  * @returns Jalaali date object
  */
-export function d2j(jdn: number): JalaaliDate {
+export function d2j(jdn: number): JalaaliObject {
   const gy = d2g(jdn).gy;
   let jy = gy - 621;
   const r = jalCal(jy, false);
@@ -186,7 +186,7 @@ export function g2d(gy: number, gm: number, gd: number): number {
  * @param jdn - Julian Day number
  * @returns Gregorian date object
  */
-export function d2g(jdn: number): GregorianDate {
+export function d2g(jdn: number): GregorianObject {
   let j = 4 * jdn + 139361631;
   j = j + div(div(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908;
   const i = div(mod(j, 1461), 4) * 5 + 308;

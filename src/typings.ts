@@ -1,7 +1,7 @@
 /**
- * Represents a date in the Jalaali (Persian) calendar.
+ * Represents a date object in the Jalaali (Persian) calendar.
  */
-export interface JalaaliDate {
+export interface JalaaliObject {
   /**
    * The Jalaali year.
    */
@@ -19,9 +19,9 @@ export interface JalaaliDate {
 }
 
 /**
- * Represents a date in the Gregorian calendar.
+ * Represents a date object in the Gregorian calendar.
  */
-export interface GregorianDate {
+export interface GregorianObject {
   /**
    * The Gregorian year.
    */

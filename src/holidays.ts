@@ -1,6 +1,6 @@
 import { toJalaali } from './core';
 import { CALENDAR_EVENTS, type CalendarEvent } from './events';
-import type { JalaaliDate } from './typings';
+import type { JalaaliObject } from './typings';
 
 /**
  * Represents a holiday event.
@@ -35,7 +35,7 @@ export interface HolidayOptions {
  * @param options - Configuration options.
  * @returns True if the date is a holiday.
  */
-export function isHoliday(date: Date | JalaaliDate, options: HolidayOptions = {}): boolean {
+export function isHoliday(date: Date | JalaaliObject, options: HolidayOptions = {}): boolean {
   const { checkFriday = true, includeWeekdays = [], events = [] } = options;
 
   let jd: number, jm: number, dayOfWeek: number;

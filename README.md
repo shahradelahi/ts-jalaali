@@ -54,6 +54,26 @@ const date = jalaali('2023-10-27');
 console.log(date.format('YYYY/MM/DD')); // 1402/08/05
 ```
 
+### The `JalaaliDate` Class
+
+The core of the library is the `JalaaliDate` class, which extends the native `Date`. This offers seamless interoperability with existing libraries (logging, ORMs, etc.) while providing high-performance Jalaali features.
+
+```ts
+import { jalaali, JalaaliDate } from '@se-oss/jalaali';
+
+// Factory function returns a JalaaliDate instance
+const date = jalaali('2023-10-27');
+
+// Direct instantiation (Jalaali year, month, day)
+const d2 = new JalaaliDate(1402, 8, 5);
+
+// Parsing from a custom format
+const d3 = JalaaliDate.fromFormat('1402-08-05 14:30', 'YYYY-MM-DD HH:mm');
+
+console.log(date instanceof Date); // true
+console.log(date.jy); // 1402
+```
+
 ### Advanced Formatting
 
 Support for localized month names and weekdays using native `Intl`.
@@ -79,11 +99,16 @@ console.log(CALENDAR_EVENTS[0]); // { month: 1, day: 1, title: '...', is_holiday
 
 ### Date Arithmetic
 
-Immutable manipulation that respects Jalaali month lengths and leap years.
+Manipulation that respects Jalaali month lengths and leap years. **Note:** `add()` mutates the instance to match native `Date` behavior. Use `.clone()` for immutable-style operations.
 
 ```ts
-const nextMonth = jalaali({ jy: 1402, jm: 6, jd: 31 }).add(1, 'month');
-console.log(nextMonth.format('YYYY/MM/DD')); // 1402/07/30 (Mehr has 30 days)
+const date = jalaali({ jy: 1402, jm: 6, jd: 31 });
+date.add(1, 'month');
+
+console.log(date.format('YYYY/MM/DD')); // 1402/07/30 (Mehr has 30 days)
+
+// Immutable example:
+const nextMonth = jalaali({ jy: 1402, jm: 6, jd: 31 }).clone().add(1, 'month');
 ```
 
 ### Persian Digits
