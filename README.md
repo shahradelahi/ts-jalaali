@@ -111,6 +111,20 @@ console.log(date.format('YYYY/MM/DD')); // 1402/07/30 (Mehr has 30 days)
 const nextMonth = jalaali({ jy: 1402, jm: 6, jd: 31 }).clone().add(1, 'month');
 ```
 
+### Advanced Setting
+
+Update multiple components at once using the Luxon-inspired `set()` API. This method handles complex edge cases like day clamping when changing months.
+
+```ts
+const date = jalaali();
+
+// Set multiple Jalaali components (chainable)
+date.set({ year: 1403, month: 12, hour: 10, minute: 30 });
+
+// Or set Gregorian components
+date.set({ gy: 2024, gm: 5, gd: 25 });
+```
+
 ### Persian Digits
 
 Built-in utility for converting digits to Persian.

@@ -1,5 +1,6 @@
 import { isLeapJalaaliYear, jalaaliMonthLength, toGregorian, toJalaali } from './core';
 import { isHoliday, type HolidayOptions } from './holidays';
+import { type DateObjectUnits } from './typings';
 import { toEnglishDigits } from './utils';
 
 /**
@@ -163,6 +164,7 @@ export class JalaaliDate extends Date {
    *
    * @param year - Jalaali year
    * @returns The new timestamp in milliseconds
+   * @deprecated Use {@link set} instead. Example: `date.set({ year: 1403 })`
    */
   setJalaaliYear(year: number): number {
     const { jm, jd } = this.#hydrate();
@@ -180,6 +182,7 @@ export class JalaaliDate extends Date {
    * @param month - Jalaali month (1-12)
    * @param day - Optional Jalaali day (1-31)
    * @returns The new timestamp in milliseconds
+   * @deprecated Use {@link set} instead. Example: `date.set({ month: 12, day: 1 })`
    */
   setJalaaliMonth(month: number, day?: number): number {
     const { jy, jd } = this.#hydrate();
@@ -196,6 +199,7 @@ export class JalaaliDate extends Date {
    *
    * @param day - Jalaali day (1-31)
    * @returns The new timestamp in milliseconds
+   * @deprecated Use {@link set} instead. Example: `date.set({ day: 15 })`
    */
   setJalaaliDate(day: number): number {
     const { jy, jm } = this.#hydrate();
@@ -203,6 +207,88 @@ export class JalaaliDate extends Date {
     super.setFullYear(gy, gm - 1, gd);
     this.#cache = { jy, jm, jd: day };
     return this.getTime();
+  }
+
+  /**
+   * "Sets" the values of specified units.
+   * Modifies the current instance. Use `.clone().set(...)` for immutability.
+   *
+   * @example
+   * date.set({ year: 1403, month: 1 })
+   * @example
+   * date.set({ gy: 2024, gm: 5, hour: 8 })
+   *
+   * @param values - Units to set
+   * @returns this
+   */
+  set(values: DateObjectUnits): this {
+    // 1. Set Time Components First
+    let timeChanged = false;
+    if (values.hour !== undefined) {
+      super.setHours(values.hour);
+      timeChanged = true;
+    }
+    if (values.minute !== undefined) {
+      super.setMinutes(values.minute);
+      timeChanged = true;
+    }
+    if (values.second !== undefined) {
+      super.setSeconds(values.second);
+      timeChanged = true;
+    }
+    if (values.millisecond !== undefined) {
+      super.setMilliseconds(values.millisecond);
+      timeChanged = true;
+    }
+
+    // Invalidate cache if time changes caused a day rollover
+    if (timeChanged) this.#invalidate();
+
+    // 2. Figure out which calendar we are manipulating
+    const hasJalaali =
+      values.jy !== undefined ||
+      values.jm !== undefined ||
+      values.jd !== undefined ||
+      values.year !== undefined ||
+      values.month !== undefined ||
+      values.day !== undefined;
+
+    const hasGregorian =
+      values.gy !== undefined || values.gm !== undefined || values.gd !== undefined;
+
+    if (hasJalaali && hasGregorian) {
+      throw new Error('Cannot set both Jalaali and Gregorian date units at the same time.');
+    }
+
+    if (hasJalaali) {
+      const { jy, jm, jd } = this.#hydrate();
+      const targetJy = values.jy ?? values.year ?? jy;
+      const targetJm = values.jm ?? values.month ?? jm;
+      const targetJd = values.jd ?? values.day ?? jd;
+
+      // Clamp the day so setting month to Esfand on day 31 clamps to 29/30 automatically
+      const maxDays = jalaaliMonthLength(targetJy, targetJm);
+      const clampedJd = Math.min(targetJd, maxDays);
+
+      const { gy, gm, gd } = toGregorian(targetJy, targetJm, clampedJd);
+
+      super.setFullYear(gy, gm - 1, gd);
+      this.#cache = { jy: targetJy, jm: targetJm, jd: clampedJd };
+    } else if (hasGregorian) {
+      const currentGy = this.getFullYear();
+      const currentGm = this.getMonth() + 1; // Native is 0-indexed
+      const currentGd = this.getDate();
+
+      const targetGy = values.gy ?? currentGy;
+      const targetGm = values.gm ?? currentGm;
+      const targetGd = values.gd ?? currentGd;
+
+      // Native JS Date naturally handles overflows (e.g. Feb 31 -> Mar 3)
+      super.setFullYear(targetGy, targetGm - 1, targetGd);
+      this.#invalidate(); // Make sure to invalidate Jalaali cache
+    }
+
+    return this;
   }
 
   // --- Overriding Native Mutators to Invalidate Cache ---
@@ -236,6 +322,39 @@ export class JalaaliDate extends Date {
   /** @inheritdoc */
   override setDate(date: number): number {
     const result = super.setDate(date);
+    this.#invalidate();
+    return result;
+  }
+
+  /** @inheritdoc */
+  override setHours(hours: number, min?: number, sec?: number, ms?: number): number {
+    const result = super.setHours(
+      hours,
+      min ?? this.getMinutes(),
+      sec ?? this.getSeconds(),
+      ms ?? this.getMilliseconds()
+    );
+    this.#invalidate();
+    return result;
+  }
+
+  /** @inheritdoc */
+  override setMinutes(min: number, sec?: number, ms?: number): number {
+    const result = super.setMinutes(min, sec ?? this.getSeconds(), ms ?? this.getMilliseconds());
+    this.#invalidate();
+    return result;
+  }
+
+  /** @inheritdoc */
+  override setSeconds(sec: number, ms?: number): number {
+    const result = super.setSeconds(sec, ms ?? this.getMilliseconds());
+    this.#invalidate();
+    return result;
+  }
+
+  /** @inheritdoc */
+  override setMilliseconds(ms: number): number {
+    const result = super.setMilliseconds(ms);
     this.#invalidate();
     return result;
   }

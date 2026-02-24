@@ -70,6 +70,71 @@ describe('Jalaali Class', () => {
     expect(d.jd).toBe(30);
   });
 
+  describe('set() API', () => {
+    it('should set Jalaali units correctly', () => {
+      const d = new JalaaliDate(1402, 1, 1);
+      d.set({ year: 1403, month: 5, day: 10 });
+      expect(d.jy).toBe(1403);
+      expect(d.jm).toBe(5);
+      expect(d.jd).toBe(10);
+    });
+
+    it('should set Gregorian units correctly and invalidate Jalaali cache', () => {
+      const d = new JalaaliDate(1402, 1, 1);
+      d.set({ gy: 2024, gm: 1, gd: 1 });
+      expect(d.getFullYear()).toBe(2024);
+      expect(d.getMonth()).toBe(0);
+      expect(d.getDate()).toBe(1);
+      // 2024-01-01 is 1402-10-11
+      expect(d.jy).toBe(1402);
+      expect(d.jm).toBe(10);
+      expect(d.jd).toBe(11);
+    });
+
+    it('should set time units correctly', () => {
+      const d = new JalaaliDate(1402, 1, 1);
+      d.set({ hour: 15, minute: 30, second: 45, millisecond: 500 });
+      expect(d.getHours()).toBe(15);
+      expect(d.getMinutes()).toBe(30);
+      expect(d.getSeconds()).toBe(45);
+      expect(d.getMilliseconds()).toBe(500);
+    });
+
+    it('should handle day clamping when changing Jalaali month', () => {
+      // 1402-06-31 (last day of 31-day month)
+      const d = new JalaaliDate(1402, 6, 31);
+      // Change to month 7 (30-day month)
+      d.set({ month: 7 });
+      expect(d.jm).toBe(7);
+      expect(d.jd).toBe(30);
+    });
+
+    it('should throw error when both Jalaali and Gregorian units are provided', () => {
+      const d = new JalaaliDate();
+      expect(() => d.set({ year: 1403, gy: 2024 })).toThrow(
+        'Cannot set both Jalaali and Gregorian date units at the same time.'
+      );
+    });
+
+    it('should invalidate cache when time mutators are used', () => {
+      const d = new JalaaliDate(1402, 1, 1, 12, 0, 0);
+      expect(d.jd).toBe(1);
+
+      // Set hours
+      d.setHours(23);
+      expect(d.getHours()).toBe(23);
+
+      d.setMinutes(45);
+      expect(d.getMinutes()).toBe(45);
+
+      d.setSeconds(30);
+      expect(d.getSeconds()).toBe(30);
+
+      d.setMilliseconds(500);
+      expect(d.getMilliseconds()).toBe(500);
+    });
+  });
+
   it('should parse Jalaali strings correctly using fromFormat', () => {
     const d = JalaaliDate.fromFormat('1404/12/02', 'YYYY/MM/DD');
     // Jalaali 1404-12-02 is Gregorian 2026-02-21
