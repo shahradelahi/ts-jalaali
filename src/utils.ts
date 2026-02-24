@@ -12,6 +12,20 @@ export function toPersianDigits(n: number | string): string {
 }
 
 /**
+ * Converts Persian digits to English digits.
+ *
+ * @param n - String containing Persian digits
+ * @returns String with Persian digits replaced by English digits
+ */
+export function toEnglishDigits(n: string): string {
+  const p = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
+  for (let i = 0; i < 10; i++) {
+    n = n.replace(p[i], i.toString());
+  }
+  return n;
+}
+
+/**
  * Validates a Jalaali date.
  *
  * @param jy - Jalaali year

@@ -79,6 +79,24 @@ describe('Jalaali Class', () => {
     expect(d.toISOString()).toContain('2026-02-21');
   });
 
+  it('should parse Persian digits with fromFormat', () => {
+    const d = JalaaliDate.fromFormat('۱۴۰۴/۱۱/۲۹ ۱۸:۱۸', 'YYYY/MM/DD HH:mm');
+    expect(d.jy).toBe(1404);
+    expect(d.jm).toBe(11);
+    expect(d.jd).toBe(29);
+    expect(d.getHours()).toBe(18);
+    expect(d.getMinutes()).toBe(18);
+  });
+
+  it('should parse English digits with fromFormat', () => {
+    const d = JalaaliDate.fromFormat('1404/11/29 18:18', 'YYYY/MM/DD HH:mm');
+    expect(d.jy).toBe(1404);
+    expect(d.jm).toBe(11);
+    expect(d.jd).toBe(29);
+    expect(d.getHours()).toBe(18);
+    expect(d.getMinutes()).toBe(18);
+  });
+
   it('should parse Jalaali strings with time correctly', () => {
     const d = JalaaliDate.fromFormat('1404-12-02 14:30:45', 'YYYY-MM-DD HH:mm:ss');
     expect(d.getHours()).toBe(14);

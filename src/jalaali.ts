@@ -1,5 +1,6 @@
 import { isLeapJalaaliYear, jalaaliMonthLength, toGregorian, toJalaali } from './core';
 import { isHoliday, type HolidayOptions } from './holidays';
+import { toEnglishDigits } from './utils';
 
 /**
  * Cache Intl formatters to improve performance.
@@ -63,6 +64,7 @@ export class JalaaliDate extends Date {
    * @returns A new JalaaliDate instance
    */
   static fromFormat(value: string, format: string): JalaaliDate {
+    const normalizedValue = toEnglishDigits(value);
     const tokens = ['YYYY', 'MM', 'DD', 'M', 'D', 'HH', 'mm', 'ss'];
     let jy = 0,
       jm = 1,
@@ -97,7 +99,7 @@ export class JalaaliDate extends Date {
       currentOffset += replacement.length - length;
     }
 
-    const match = value.match(new RegExp(`^${regexStr}$`));
+    const match = normalizedValue.match(new RegExp(`^${regexStr}$`));
     if (!match) {
       throw new Error(`Value "${value}" does not match format "${format}"`);
     }
