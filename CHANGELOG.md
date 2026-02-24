@@ -1,5 +1,12 @@
 # @se-oss/jalaali
 
+## 1.2.0
+
+### Minor Changes
+
+- 77e8004: Add support for Persian digits in `JalaaliDate.fromFormat` and introduce `toEnglishDigits` utility.
+- 7545852: Added a comprehensive `set()` API to `JalaaliDate` for updating multiple date/time components (both Jalaali and Gregorian) in a single operation with automatic day clamping.
+
 ## 1.1.0
 
 ### Minor Changes
